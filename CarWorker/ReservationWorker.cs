@@ -1,9 +1,8 @@
 ﻿using CarReservationRepositories;
-using CarReservationRepositories.Entities;
 using CarReservationWorker.Services;
-using CarReservationWorkers;
 using CarReservationWorkers.Models;
 using CarReservationWorkers.Services;
+using CarReservationWorkers.Utilities;
 
 namespace CarReservationWorker
 {
@@ -35,74 +34,55 @@ namespace CarReservationWorker
 
         public Task<ValidationResult> Create(ReservationCreateModel createModel)
         {
-            var validationResults = ValidateModel(createModel);
+            var validationResult = ValidateModel(createModel);
 
-            if (validationResults.Any(x => x.HasError))
+            if (validationResult.HasError)
             {
-                return Task.FromResult(validationResults.First(x => x.HasError));
+                return Task.FromResult(validationResult);
             }
 
-            var entity = MapToEntity(createModel);
+            var entity = Mapper.MapToEntity(createModel);
 
             _reservationRepository.Create(entity);
 
             return Task.FromResult(new ValidationResult());
         }
+
         public Task<List<ReservationModel>> GetAll()
         {
             var entites = _reservationRepository.GetAll();
 
-            var models = MapToModel(entites);
+            var models = Mapper.MapToModel(entites);
 
             return Task.FromResult(models);
         }
 
-        private List<ValidationResult> ValidateModel(ReservationCreateModel model)
+        private ValidationResult ValidateModel(ReservationCreateModel model)
         {
-            var validationResults = new List<ValidationResult>();
-
             var carEntity = _carRepository.GetById(model.CarId);
 
             var carValidationResult = _carValidationService.Validate(carEntity);
 
-            validationResults.Add(carValidationResult);
+            if(carValidationResult.HasError)
+            {
+                return carValidationResult;
+            }
 
             ValidationResult validationResult = _validationService.IsValidModel(model);
 
-            validationResults.Add(validationResult);
+            if (validationResult.HasError)
+            {
+                return validationResult;
+            }
 
             var reservations = _reservationRepository.GetAll();
 
-            var entity = MapToEntity(model);
+            var entity = Mapper.MapToEntity(model);
 
             ValidationResult availabilityResult = _reservationService.IsAvailableTimeSlot(reservations, entity);
 
-            validationResults.Add(availabilityResult);
-
-            return validationResults;
+            return availabilityResult;
         }
-
-        private ReservationCreateEntity MapToEntity(ReservationCreateModel createModel)
-        {
-            return new ReservationCreateEntity
-            {
-                CarId = createModel.CarId,
-                StartTime = createModel.StartTime,
-                EndTime = createModel.StartTime + TimeSpan.FromMinutes(createModel.DurationInMinutes)
-            };
-        }
-
-
-        private List<ReservationModel> MapToModel(List<ReservationEntity> entites)
-        {
-            return entites.Select(x => new ReservationModel
-            {
-                StartTime = x.StartTime,
-                CarId = x.CarId,
-                Id = x.Id,
-                DurationInMinutes = (x.EndTime - x.StartTime).TotalMinutes
-
-            }).ToList();
-        }
+       
     }
 }

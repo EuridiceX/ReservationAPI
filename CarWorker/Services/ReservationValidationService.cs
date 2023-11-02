@@ -1,5 +1,6 @@
 ﻿using CarReservationWorkers.Constants;
 using CarReservationWorkers.Models;
+using CarReservationWorkers.Utilities;
 
 namespace CarReservationWorkers.Services
 {

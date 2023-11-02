@@ -2,8 +2,8 @@
 using CarReservationRepositories;
 using CarReservationRepositories.Entities;
 using CarReservationWorker.Services;
-using CarReservationWorkers;
 using CarReservationWorkers.Models;
+using CarReservationWorkers.Utilities;
 
 namespace CarReservationWorker
 {
