@@ -1,20 +1,33 @@
-﻿using CarReservationWorkers;
+﻿using CarReservationRepositories.Entities;
+using CarReservationWorkers;
+using CarReservationWorkers.Constants;
 using System.Text.RegularExpressions;
 
 namespace CarReservationWorker.Services
 {
     public interface ICarValidationService
     {
-        OperationResult ValidateNumber(string number);
+        ValidationResult ValidateNumber(string number);
+        ValidationResult Validate(CarEntity entity);
     }
 
     public class CarValidationService : ICarValidationService
     {
-        public OperationResult ValidateNumber(string number)
+        public ValidationResult Validate(CarEntity entity)
         {
-            var result = new OperationResult();
+            var result = new ValidationResult();
+            if (entity == null)
+            {
+                result.CreateError(System.Net.HttpStatusCode.NotFound, ErrorMessages.CarNotFound);
+            }
+            return result;
+        }
+
+        public ValidationResult ValidateNumber(string number)
+        {
+            var result = new ValidationResult();
             string pattern = @"^C<\d+>$";
-            
+
             if (Regex.IsMatch(number, pattern))
             {
                 return result;
@@ -23,5 +36,7 @@ namespace CarReservationWorker.Services
             result.CreateError(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidNumber);
             return result;
         }
+
+
     }
 }

@@ -3,7 +3,7 @@ using CarReservation.ViewModels;
 using CarReservationWorkers.Models;
 using CarReservationWorker;
 using Microsoft.AspNetCore.Mvc;
-using CarReservationAPI.Controllers;
+using CarReservationAPI.Extensions;
 
 namespace CarReservation.Controllers
 {
@@ -28,16 +28,16 @@ namespace CarReservation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<CarViewModel> GetById( Guid id)
+        public async Task<CarViewModel> GetById(Guid id)
         {
-          var carModel =  await _carWorker.GetById(id);
-          return _mapper.Map<CarViewModel>(carModel);
+            var carModel = await _carWorker.GetById(id);
+            return _mapper.Map<CarViewModel>(carModel);
         }
 
         [HttpPost]
-        public  async Task<IActionResult> Create([FromBody] CarCreateViewModel viewModel)
+        public async Task<IActionResult> Create([FromBody] CarCreateViewModel viewModel)
         {
-            var model =  _mapper.Map<CarCreateModel>(viewModel);
+            var model = _mapper.Map<CarCreateModel>(viewModel);
             var result = await _carWorker.Create(model);
 
             return this.GetResult(result);
@@ -47,15 +47,15 @@ namespace CarReservation.Controllers
         public async Task<IActionResult> Put(Guid id, [FromBody] CarCreateViewModel viewModel)
         {
             var model = _mapper.Map<CarCreateModel>(viewModel);
-            var result = await _carWorker.Update(model,id);
-           
+            var result = await _carWorker.Update(model, id);
+
             return this.GetResult(result);
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-             await _carWorker.Remove(id);
+            await _carWorker.Remove(id);
         }
     }
 }

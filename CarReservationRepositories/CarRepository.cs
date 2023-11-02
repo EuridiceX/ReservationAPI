@@ -37,14 +37,14 @@ namespace CarReservationRepositories
             data.Cars.Remove(updateEntity);
 
             CarEntity newEntity = _mapper.Map<CarEntity>(car);
-            newEntity.Id = id;  
+            newEntity.Id = id;
 
             data.Cars.Add(newEntity);
         }
 
         public CarEntity GetById(Guid id)
         {
-            return data.Cars.FirstOrDefault(x=>x.Id == id);
+            return data.Cars.FirstOrDefault(x => x.Id == id);
         }
 
         public void Remove(Guid id)

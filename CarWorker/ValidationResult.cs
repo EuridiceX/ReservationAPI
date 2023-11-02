@@ -2,16 +2,16 @@
 
 namespace CarReservationWorkers
 {
-    public class OperationResult
+    public class ValidationResult
     {
         private Error _error;
         public Error Error => _error;
 
         public bool HasError => Error != null;
 
-        public OperationResult() { }
+        public ValidationResult() { }
 
-        public OperationResult(HttpStatusCode type, string error)
+        public ValidationResult(HttpStatusCode type, string error)
         {
             CreateError(type, error);
         }

@@ -9,8 +9,8 @@ namespace CarReservationWorker
 {
     public interface ICarWorker
     {
-        Task<OperationResult> Create(CarCreateModel car);
-        Task<OperationResult> Update(CarCreateModel car, Guid id);
+        Task<ValidationResult> Create(CarCreateModel car);
+        Task<ValidationResult> Update(CarCreateModel car, Guid id);
         Task<CarModel> GetById(Guid id);
         Task<List<CarModel>> GetAll();
         Task Remove(Guid id);
@@ -30,16 +30,16 @@ namespace CarReservationWorker
             _validationService = validationService;
         }
 
-        public Task<OperationResult> Create(CarCreateModel car)
+        public Task<ValidationResult> Create(CarCreateModel car)
         {
-            OperationResult result = _validationService.ValidateNumber(car.Number);
-          
+            ValidationResult result = _validationService.ValidateNumber(car.Number);
+
             if (result.HasError)
             {
                 return Task.FromResult(result);
             }
             var entity = _mapper.Map<CarCreateEntity>(car);
-          
+
             _repository.Create(entity);
 
             return Task.FromResult(result);
@@ -56,7 +56,7 @@ namespace CarReservationWorker
 
         public Task<CarModel> GetById(Guid id)
         {
-           var entity = _repository.GetById(id);
+            var entity = _repository.GetById(id);
 
             return Task.FromResult(_mapper.Map<CarModel>(entity));
         }
@@ -68,16 +68,16 @@ namespace CarReservationWorker
             return Task.CompletedTask;
         }
 
-        public Task<OperationResult> Update(CarCreateModel car, Guid id)
+        public Task<ValidationResult> Update(CarCreateModel car, Guid id)
         {
-            OperationResult result = _validationService.ValidateNumber(car.Number);
+            ValidationResult result = _validationService.ValidateNumber(car.Number);
             if (result.HasError)
             {
                 return Task.FromResult(result);
             }
 
             var entity = _mapper.Map<CarCreateEntity>(car);
-          
+
             _repository.Update(entity, id);
 
             return Task.FromResult(result);
