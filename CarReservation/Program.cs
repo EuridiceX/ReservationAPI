@@ -1,13 +1,13 @@
-using CarReservation.Controllers;
 using CarReservationRepositories;
+using CarReservationWorker;
+using CarReservationWorker.Services;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddSingleton<Data>();
 builder.Services.AddScoped<ICarRepository,CarRepository>();
-builder.Services.AddTransient<Data>();
+builder.Services.AddTransient<ICarWorker,CarWorker>();
+builder.Services.AddTransient<ICarValidationService,CarValidationService>();
 builder.Services.AddSingleton<Data>();
 
 var assemblyNames = new List<AssemblyName>()
@@ -39,7 +39,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

@@ -1,15 +1,14 @@
-﻿namespace CarReservationRepositories.Entities
+﻿using AutoMapper;
+
+namespace CarReservationRepositories.Entities
 {
-    public class CarEntity
+    public class CarEntity : CarCreateEntity
     {
         public Guid Id { get; set; }
 
-        public static implicit operator CarEntity(CarCreateEntity v)
-        {
-            throw new NotImplementedException();
-        }
     }
 
+    [AutoMap(typeof(CarEntity), ReverseMap = true)]
     public class CarCreateEntity
     {
         public string Model { get; set; }

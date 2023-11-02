@@ -1,16 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CarReservationWorkers;
+using System.Text.RegularExpressions;
 
-namespace CarWorker.Services
+namespace CarReservationWorker.Services
 {
-    internal class CarValidationService
+    public interface ICarValidationService
     {
-        public void ValidateNumber(string number)
-        {
+        OperationResult ValidateNumber(string number);
+    }
 
+    public class CarValidationService : ICarValidationService
+    {
+        public OperationResult ValidateNumber(string number)
+        {
+            var result = new OperationResult();
+            string pattern = @"^C<\d+>$";
+            
+            if (Regex.IsMatch(number, pattern))
+            {
+                return result;
+            }
+
+            result.CreateError(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidNumber);
+            return result;
         }
     }
 }

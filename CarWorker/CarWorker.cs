@@ -1,48 +1,86 @@
 ﻿using AutoMapper;
 using CarReservationRepositories;
+using CarReservationRepositories.Entities;
+using CarReservationWorker.Services;
+using CarReservationWorkers;
 using CarReservationWorkers.Models;
 
-namespace CarWorker
+namespace CarReservationWorker
 {
     public interface ICarWorker
     {
-        void Create(CarCreateModel car);
-        void Update(CarCreateModel car, Guid id);
-        CarModel GetById(Guid id);
-        void Remove(Guid id);
-
+        Task<OperationResult> Create(CarCreateModel car);
+        Task<OperationResult> Update(CarCreateModel car, Guid id);
+        Task<CarModel> GetById(Guid id);
+        Task<List<CarModel>> GetAll();
+        Task Remove(Guid id);
     }
 
     public class CarWorker : ICarWorker
     {
         private readonly ICarRepository _repository;
+        private readonly ICarValidationService _validationService;
         private readonly IMapper _mapper;
 
-        public CarWorker(ICarRepository repository, IMapper mapper)
+        public CarWorker(ICarRepository repository, IMapper mapper,
+            ICarValidationService validationService)
         {
             _repository = repository;
             _mapper = mapper;
+            _validationService = validationService;
         }
 
-        public void Create(CarCreateModel car)
+        public Task<OperationResult> Create(CarCreateModel car)
         {
+            OperationResult result = _validationService.ValidateNumber(car.Number);
+          
+            if (result.HasError)
+            {
+                return Task.FromResult(result);
+            }
             var entity = _mapper.Map<CarCreateEntity>(car);
+          
             _repository.Create(entity);
+
+            return Task.FromResult(result);
         }
 
-        public CarModel GetById(Guid id)
+        public Task<List<CarModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var entites = _repository.GetAll();
+
+            var models = _mapper.Map<List<CarModel>>(entites);
+
+            return Task.FromResult(models);
         }
 
-        public void Remove(Guid id)
+        public Task<CarModel> GetById(Guid id)
         {
-            throw new NotImplementedException();
+           var entity = _repository.GetById(id);
+
+            return Task.FromResult(_mapper.Map<CarModel>(entity));
         }
 
-        public void Update(CarCreateModel car, Guid id)
+        public Task Remove(Guid id)
         {
-            throw new NotImplementedException();
+            _repository.Remove(id);
+
+            return Task.CompletedTask;
+        }
+
+        public Task<OperationResult> Update(CarCreateModel car, Guid id)
+        {
+            OperationResult result = _validationService.ValidateNumber(car.Number);
+            if (result.HasError)
+            {
+                return Task.FromResult(result);
+            }
+
+            var entity = _mapper.Map<CarCreateEntity>(car);
+          
+            _repository.Update(entity, id);
+
+            return Task.FromResult(result);
         }
     }
 }

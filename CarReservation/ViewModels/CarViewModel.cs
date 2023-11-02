@@ -9,6 +9,7 @@ namespace CarReservation.ViewModels
         public Guid Id { get; set; }   
     }
 
+    [AutoMap(typeof(CarCreateModel), ReverseMap = true)]
     public class CarCreateViewModel
     {
         public string Model { get; set; }

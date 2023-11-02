@@ -1,4 +1,5 @@
-﻿using CarReservationRepositories.Entities;
+﻿using AutoMapper;
+using CarReservationRepositories.Entities;
 
 namespace CarReservationRepositories
 {
@@ -6,21 +7,27 @@ namespace CarReservationRepositories
     {
         void Create(CarCreateEntity car);
         void Update(CarCreateEntity car, Guid id);
-        CarEntity GetById();
+        CarEntity GetById(Guid id);
+        List<CarEntity> GetAll();
         void Remove(Guid id);
     }
     public class CarRepository : ICarRepository
     {
         private readonly Data data;
+        private readonly IMapper _mapper;
 
-        public CarRepository(Data data)
+        public CarRepository(Data data, IMapper mapper)
         {
             this.data = data;
+            _mapper = mapper;
         }
 
         public void Create(CarCreateEntity car)
         {
-            data.Cars.Add(car);
+            CarEntity newEntity = _mapper.Map<CarEntity>(car);
+            newEntity.Id = Guid.NewGuid();
+
+            data.Cars.Add(newEntity);
         }
 
         public void Update(CarCreateEntity car, Guid id)
@@ -29,21 +36,26 @@ namespace CarReservationRepositories
 
             data.Cars.Remove(updateEntity);
 
-            CarEntity newEntity = car;
+            CarEntity newEntity = _mapper.Map<CarEntity>(car);
             newEntity.Id = id;  
 
             data.Cars.Add(newEntity);
         }
 
-        public CarEntity GetById()
+        public CarEntity GetById(Guid id)
         {
-            return data.Cars.FirstOrDefault();
+            return data.Cars.FirstOrDefault(x=>x.Id == id);
         }
 
-        public void Remove(string car)
+        public void Remove(Guid id)
         {
-            data.Cars.Remove(car);
+            var removeEntity = data.Cars.FirstOrDefault(x => x.Id == id);
+            data.Cars.Remove(removeEntity);
         }
 
+        public List<CarEntity> GetAll()
+        {
+            return data.Cars;
+        }
     }
 }
