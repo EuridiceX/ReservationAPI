@@ -48,6 +48,14 @@ namespace CarReservationWorker
 
             return Task.FromResult(new ValidationResult());
         }
+        public Task<List<ReservationModel>> GetAll()
+        {
+            var entites = _reservationRepository.GetAll();
+
+            var models = MapToModel(entites);
+
+            return Task.FromResult(models);
+        }
 
         private List<ValidationResult> ValidateModel(ReservationCreateModel model)
         {
@@ -84,14 +92,6 @@ namespace CarReservationWorker
             };
         }
 
-        public Task<List<ReservationModel>> GetAll()
-        {
-            var entites = _reservationRepository.GetAll();
-
-            var models = MapToModel(entites);
-
-            return Task.FromResult(models);
-        }
 
         private List<ReservationModel> MapToModel(List<ReservationEntity> entites)
         {
